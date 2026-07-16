@@ -1,6 +1,7 @@
 import { updateGround, setupGround } from "./ground.js"
 import { updateDino, setupDino, getDinoRect, setDinoLose } from "./dino.js"
 import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
+import { updateBird, setupBird, getBirdRects } from "./bird.js"
 
 const WORLD_WIDTH = 100
 const WORLD_HEIGHT = 30
@@ -28,6 +29,7 @@ function update(time) {
   updateGround(delta, speedScale)
   updateDino(delta, speedScale)
   updateCactus(delta, speedScale)
+  updateBird(delta, speedScale)
   updateSpeedScale(delta)
   updateScore(delta)
   if (checkLose()) return handleLose()
@@ -38,7 +40,9 @@ function update(time) {
 
 function checkLose() {
   const dinoRect = getDinoRect()
-  return getCactusRects().some(rect => isCollision(rect, dinoRect))
+  return [...getCactusRects(), ...getBirdRects()].some(rect =>
+    isCollision(rect, dinoRect)
+  )
 }
 
 function isCollision(rect1, rect2) {
@@ -66,6 +70,7 @@ function handleStart() {
   setupGround()
   setupDino()
   setupCactus()
+  setupBird()
   startScreenElem.classList.add("hide")
   window.requestAnimationFrame(update)
 }

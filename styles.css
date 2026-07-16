@@ -51,9 +51,20 @@ body {
   bottom: calc(var(--bottom) * 1%);
 }
 
+.dino.ducking {
+  height: 14%;
+}
+
 .cactus {
   position: absolute;
   left: calc(var(--left) * 1%);
   height: 30%;
   bottom: 0;
+}
+
+.bird {
+  position: absolute;
+  left: calc(var(--left) * 1%);
+  height: 14%;
+  bottom: 16%;
 }
