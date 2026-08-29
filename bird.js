@@ -7,7 +7,7 @@ import {
 const SPEED = 0.05
 const BIRD_INTERVAL_MIN = 1000
 const BIRD_INTERVAL_MAX = 3000
-const BIRD_START_DELAY = 15000
+const BIRD_START_DELAY = 60000
 const worldElem = document.querySelector("[data-world]")
 
 let nextBirdTime

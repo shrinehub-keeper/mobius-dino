@@ -7,11 +7,12 @@ import {
 const SPEED = 0.05
 const CACTUS_INTERVAL_MIN = 500
 const CACTUS_INTERVAL_MAX = 2000
+const CACTUS_START_DELAY = 1500
 const worldElem = document.querySelector("[data-world]")
 
 let nextCactusTime
 export function setupCactus() {
-  nextCactusTime = CACTUS_INTERVAL_MIN
+  nextCactusTime = CACTUS_START_DELAY
   document.querySelectorAll("[data-cactus]").forEach(cactus => {
     cactus.remove()
   })
