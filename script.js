@@ -1,26 +1,39 @@
-import { updateGround, setupGround } from "./ground.js"
-import { updateDino, setupDino, getDinoRect, setDinoLose } from "./dino.js"
-import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
-import { updateBird, setupBird, getBirdRects } from "./bird.js"
-import { setupTheme } from "./theme.js"
+const { updateGround, setupGround } = window.Ground
+const { updateDino, setupDino, getDinoRect, setDinoLose } = window.Dino
+const { updateCactus, setupCactus, getCactusRects } = window.Cactus
+const { updateBird, setupBird, getBirdRects } = window.Bird
+const { setupTheme } = window.Theme
+const { playSound } = window.Sound
 
 const WORLD_WIDTH = 100
 const WORLD_HEIGHT = 30
+const WORLD_MAX_WIDTH = 800
 const SPEED_SCALE_INCREASE = 0.00001
+const DINO_HITBOX_INSET = 0.2
+const OBSTACLE_HITBOX_INSET = 0.1
+const MILESTONE_SCORE = 100
+const MILESTONE_SPEED_BUMP = 0.1
 
 const worldElem = document.querySelector("[data-world]")
 const scoreElem = document.querySelector("[data-score]")
 const startScreenElem = document.querySelector("[data-start-screen]")
+const pauseHintElem = document.querySelector("[data-pause-hint]")
 
 setPixelToWorldScale()
 setupTheme()
 window.addEventListener("resize", setPixelToWorldScale)
 document.addEventListener("keydown", handleStart, { once: true })
+document.addEventListener("keydown", togglePause)
 
 let lastTime
 let speedScale
 let score
+let lastMilestone
+let isRunning
+let isPaused
 function update(time) {
+  if (isPaused) return
+
   if (lastTime == null) {
     lastTime = time
     window.requestAnimationFrame(update)
@@ -41,10 +54,21 @@ function update(time) {
 }
 
 function checkLose() {
-  const dinoRect = getDinoRect()
-  return [...getCactusRects(), ...getBirdRects()].some(rect =>
-    isCollision(rect, dinoRect)
-  )
+  const dinoRect = shrinkRect(getDinoRect(), DINO_HITBOX_INSET)
+  return [...getCactusRects(), ...getBirdRects()]
+    .map(rect => shrinkRect(rect, OBSTACLE_HITBOX_INSET))
+    .some(rect => isCollision(rect, dinoRect))
+}
+
+function shrinkRect(rect, insetRatio) {
+  const insetX = rect.width * insetRatio
+  const insetY = rect.height * insetRatio
+  return {
+    left: rect.left + insetX,
+    right: rect.right - insetX,
+    top: rect.top + insetY,
+    bottom: rect.bottom - insetY,
+  }
 }
 
 function isCollision(rect1, rect2) {
@@ -63,26 +87,55 @@ function updateSpeedScale(delta) {
 function updateScore(delta) {
   score += delta * 0.01
   scoreElem.textContent = Math.floor(score)
+
+  const milestone = Math.floor(score / MILESTONE_SCORE)
+  while (milestone > lastMilestone) {
+    lastMilestone++
+    speedScale += MILESTONE_SPEED_BUMP
+    playSound("ring")
+  }
 }
 
 function handleStart() {
   lastTime = null
   speedScale = 1
   score = 0
+  lastMilestone = 0
+  isRunning = true
+  isPaused = false
   setupGround()
   setupDino()
   setupCactus()
   setupBird()
   startScreenElem.classList.add("hide")
+  pauseHintElem.textContent = "Press Enter to pause"
+  pauseHintElem.classList.remove("hide")
   window.requestAnimationFrame(update)
 }
 
 function handleLose() {
+  isRunning = false
+  isPaused = false
   setDinoLose()
+  playSound("death")
+  pauseHintElem.classList.add("hide")
   setTimeout(() => {
     document.addEventListener("keydown", handleStart, { once: true })
     startScreenElem.classList.remove("hide")
   }, 100)
+}
+
+function togglePause(e) {
+  if (e.code !== "Enter" || !isRunning) return
+
+  isPaused = !isPaused
+  if (isPaused) {
+    pauseHintElem.textContent = "Paused - Press Enter to resume"
+  } else {
+    pauseHintElem.textContent = "Press Enter to pause"
+    lastTime = null
+    window.requestAnimationFrame(update)
+  }
 }
 
 function setPixelToWorldScale() {
@@ -93,6 +146,9 @@ function setPixelToWorldScale() {
     worldToPixelScale = window.innerHeight / WORLD_HEIGHT
   }
 
-  worldElem.style.width = `${WORLD_WIDTH * worldToPixelScale}px`
-  worldElem.style.height = `${WORLD_HEIGHT * worldToPixelScale}px`
+  const width = Math.min(WORLD_WIDTH * worldToPixelScale, WORLD_MAX_WIDTH)
+  const height = (width * WORLD_HEIGHT) / WORLD_WIDTH
+
+  worldElem.style.width = `${width}px`
+  worldElem.style.height = `${height}px`
 }
