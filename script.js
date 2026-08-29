@@ -17,17 +17,23 @@ const MILESTONE_SPEED_BUMP = 0.1
 const worldElem = document.querySelector("[data-world]")
 const scoreElem = document.querySelector("[data-score]")
 const startScreenElem = document.querySelector("[data-start-screen]")
+const pauseHintElem = document.querySelector("[data-pause-hint]")
 
 setPixelToWorldScale()
 setupTheme()
 window.addEventListener("resize", setPixelToWorldScale)
 document.addEventListener("keydown", handleStart, { once: true })
+document.addEventListener("keydown", togglePause)
 
 let lastTime
 let speedScale
 let score
 let lastMilestone
+let isRunning
+let isPaused
 function update(time) {
+  if (isPaused) return
+
   if (lastTime == null) {
     lastTime = time
     window.requestAnimationFrame(update)
@@ -95,21 +101,41 @@ function handleStart() {
   speedScale = 1
   score = 0
   lastMilestone = 0
+  isRunning = true
+  isPaused = false
   setupGround()
   setupDino()
   setupCactus()
   setupBird()
   startScreenElem.classList.add("hide")
+  pauseHintElem.textContent = "Press Enter to pause"
+  pauseHintElem.classList.remove("hide")
   window.requestAnimationFrame(update)
 }
 
 function handleLose() {
+  isRunning = false
+  isPaused = false
   setDinoLose()
   playSound("death")
+  pauseHintElem.classList.add("hide")
   setTimeout(() => {
     document.addEventListener("keydown", handleStart, { once: true })
     startScreenElem.classList.remove("hide")
   }, 100)
+}
+
+function togglePause(e) {
+  if (e.code !== "Enter" || !isRunning) return
+
+  isPaused = !isPaused
+  if (isPaused) {
+    pauseHintElem.textContent = "Paused - Press Enter to resume"
+  } else {
+    pauseHintElem.textContent = "Press Enter to pause"
+    lastTime = null
+    window.requestAnimationFrame(update)
+  }
 }
 
 function setPixelToWorldScale() {

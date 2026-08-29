@@ -83,6 +83,13 @@ body[data-theme="mocha"] {
   transform: translate(-50%, -50%);
 }
 
+.pause-hint {
+  position: absolute;
+  font-size: 2vmin;
+  left: 1vmin;
+  top: 1vmin;
+}
+
 .hide {
   display: none;
 }

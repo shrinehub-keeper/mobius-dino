@@ -11,6 +11,7 @@ window.Dino = (function () {
   const RUN_SRCS = ["imgs/dino-run-0.png", "imgs/dino-run-1.png"]
   const BALL_SRC = "imgs/dino-ball.png"
   const LOSE_SRC = "imgs/dino-lose.png"
+  const JUMP_KEYS = ["Space", "ArrowUp", "KeyW"]
 
   let isJumping
   let isDucking
@@ -75,7 +76,7 @@ window.Dino = (function () {
   }
 
   function onJump(e) {
-    if (e.code !== "Space" || isJumping || isDucking) return
+    if (!JUMP_KEYS.includes(e.code) || isJumping || isDucking) return
 
     yVelocity = JUMP_SPEED
     isJumping = true
