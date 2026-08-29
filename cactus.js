@@ -8,6 +8,12 @@ const SPEED = 0.05
 const CACTUS_INTERVAL_MIN = 500
 const CACTUS_INTERVAL_MAX = 2000
 const CACTUS_START_DELAY = 1500
+const WORLD_WIDTH = 100
+const WORLD_HEIGHT = 30
+const CACTUS_HEIGHT_PERCENT = 30 // matches .cactus { height: 30% } in styles.css
+const CACTUS_ASPECT_RATIO = 37 / 37 // cactus.png is 37x37
+const CACTUS_WIDTH_PERCENT =
+  (WORLD_HEIGHT / WORLD_WIDTH) * (CACTUS_HEIGHT_PERCENT / 100) * CACTUS_ASPECT_RATIO * 100
 const worldElem = document.querySelector("[data-world]")
 
 let nextCactusTime
@@ -41,12 +47,28 @@ export function getCactusRects() {
 }
 
 function createCactus() {
+  const clusterSize = pickClusterSize()
+  let left = 100
+  for (let i = 0; i < clusterSize; i++) {
+    createCactusSprite(left)
+    left += CACTUS_WIDTH_PERCENT
+  }
+}
+
+function createCactusSprite(left) {
   const cactus = document.createElement("img")
   cactus.dataset.cactus = true
   cactus.src = "imgs/cactus.png"
   cactus.classList.add("cactus")
-  setCustomProperty(cactus, "--left", 100)
+  setCustomProperty(cactus, "--left", left)
   worldElem.append(cactus)
+}
+
+function pickClusterSize() {
+  const roll = Math.random()
+  if (roll < 0.6) return 1
+  if (roll < 0.9) return 2
+  return 3
 }
 
 function randomNumberBetween(min, max) {

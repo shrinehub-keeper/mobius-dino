@@ -3,6 +3,7 @@ import { updateDino, setupDino, getDinoRect, setDinoLose } from "./dino.js"
 import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
 import { updateBird, setupBird, getBirdRects } from "./bird.js"
 import { setupTheme } from "./theme.js"
+import { playSound } from "./sound.js"
 
 const WORLD_WIDTH = 100
 const WORLD_HEIGHT = 30
@@ -10,6 +11,8 @@ const WORLD_MAX_WIDTH = 800
 const SPEED_SCALE_INCREASE = 0.00001
 const DINO_HITBOX_INSET = 0.2
 const OBSTACLE_HITBOX_INSET = 0.1
+const MILESTONE_SCORE = 100
+const MILESTONE_SPEED_BUMP = 0.1
 
 const worldElem = document.querySelector("[data-world]")
 const scoreElem = document.querySelector("[data-score]")
@@ -23,6 +26,7 @@ document.addEventListener("keydown", handleStart, { once: true })
 let lastTime
 let speedScale
 let score
+let lastMilestone
 function update(time) {
   if (lastTime == null) {
     lastTime = time
@@ -77,12 +81,20 @@ function updateSpeedScale(delta) {
 function updateScore(delta) {
   score += delta * 0.01
   scoreElem.textContent = Math.floor(score)
+
+  const milestone = Math.floor(score / MILESTONE_SCORE)
+  while (milestone > lastMilestone) {
+    lastMilestone++
+    speedScale += MILESTONE_SPEED_BUMP
+    playSound("ring")
+  }
 }
 
 function handleStart() {
   lastTime = null
   speedScale = 1
   score = 0
+  lastMilestone = 0
   setupGround()
   setupDino()
   setupCactus()
@@ -93,6 +105,7 @@ function handleStart() {
 
 function handleLose() {
   setDinoLose()
+  playSound("death")
   setTimeout(() => {
     document.addEventListener("keydown", handleStart, { once: true })
     startScreenElem.classList.remove("hide")

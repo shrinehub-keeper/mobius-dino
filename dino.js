@@ -3,6 +3,7 @@ import {
   setCustomProperty,
   getCustomProperty,
 } from "./updateCustomProperty.js"
+import { playSound } from "./sound.js"
 
 const dinoElem = document.querySelector("[data-dino]")
 const JUMP_SPEED = 0.45
@@ -79,6 +80,7 @@ function onJump(e) {
 
   yVelocity = JUMP_SPEED
   isJumping = true
+  playSound("jump")
 }
 
 function onDuckStart(e) {
