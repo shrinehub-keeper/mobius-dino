@@ -1,9 +1,9 @@
-import { updateGround, setupGround } from "./ground.js"
-import { updateDino, setupDino, getDinoRect, setDinoLose } from "./dino.js"
-import { updateCactus, setupCactus, getCactusRects } from "./cactus.js"
-import { updateBird, setupBird, getBirdRects } from "./bird.js"
-import { setupTheme } from "./theme.js"
-import { playSound } from "./sound.js"
+const { updateGround, setupGround } = window.Ground
+const { updateDino, setupDino, getDinoRect, setDinoLose } = window.Dino
+const { updateCactus, setupCactus, getCactusRects } = window.Cactus
+const { updateBird, setupBird, getBirdRects } = window.Bird
+const { setupTheme } = window.Theme
+const { playSound } = window.Sound
 
 const WORLD_WIDTH = 100
 const WORLD_HEIGHT = 30

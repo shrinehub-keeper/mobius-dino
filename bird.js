@@ -1,58 +1,60 @@
-import {
-  setCustomProperty,
-  incrementCustomProperty,
-  getCustomProperty,
-} from "./updateCustomProperty.js"
+window.Bird = (function () {
+  const { setCustomProperty, incrementCustomProperty, getCustomProperty } =
+    window.UpdateCustomProperty
 
-const SPEED = 0.05
-const BIRD_INTERVAL_MIN = 1000
-const BIRD_INTERVAL_MAX = 3000
-const BIRD_START_DELAY = 30000
-const worldElem = document.querySelector("[data-world]")
+  const SPEED = 0.05
+  const BIRD_INTERVAL_MIN = 1000
+  const BIRD_INTERVAL_MAX = 3000
+  const BIRD_START_DELAY = 30000
+  const worldElem = document.querySelector("[data-world]")
 
-let nextBirdTime
-let elapsedTime
-export function setupBird() {
-  nextBirdTime = BIRD_START_DELAY
-  elapsedTime = 0
-  document.querySelectorAll("[data-bird]").forEach(bird => {
-    bird.remove()
-  })
-}
+  let nextBirdTime
+  let elapsedTime
 
-export function updateBird(delta, speedScale) {
-  elapsedTime += delta
-
-  document.querySelectorAll("[data-bird]").forEach(bird => {
-    incrementCustomProperty(bird, "--left", delta * speedScale * SPEED * -1)
-    if (getCustomProperty(bird, "--left") <= -100) {
+  function setupBird() {
+    nextBirdTime = BIRD_START_DELAY
+    elapsedTime = 0
+    document.querySelectorAll("[data-bird]").forEach(bird => {
       bird.remove()
-    }
-  })
-
-  if (nextBirdTime <= 0) {
-    createBird()
-    nextBirdTime =
-      randomNumberBetween(BIRD_INTERVAL_MIN, BIRD_INTERVAL_MAX) / speedScale
+    })
   }
-  nextBirdTime -= delta
-}
 
-export function getBirdRects() {
-  return [...document.querySelectorAll("[data-bird]")].map(bird => {
-    return bird.getBoundingClientRect()
-  })
-}
+  function updateBird(delta, speedScale) {
+    elapsedTime += delta
 
-function createBird() {
-  const bird = document.createElement("img")
-  bird.dataset.bird = true
-  bird.src = "imgs/bird.png"
-  bird.classList.add("bird")
-  setCustomProperty(bird, "--left", 100)
-  worldElem.append(bird)
-}
+    document.querySelectorAll("[data-bird]").forEach(bird => {
+      incrementCustomProperty(bird, "--left", delta * speedScale * SPEED * -1)
+      if (getCustomProperty(bird, "--left") <= -100) {
+        bird.remove()
+      }
+    })
 
-function randomNumberBetween(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
+    if (nextBirdTime <= 0) {
+      createBird()
+      nextBirdTime =
+        randomNumberBetween(BIRD_INTERVAL_MIN, BIRD_INTERVAL_MAX) / speedScale
+    }
+    nextBirdTime -= delta
+  }
+
+  function getBirdRects() {
+    return [...document.querySelectorAll("[data-bird]")].map(bird => {
+      return bird.getBoundingClientRect()
+    })
+  }
+
+  function createBird() {
+    const bird = document.createElement("img")
+    bird.dataset.bird = true
+    bird.src = "imgs/bird.png"
+    bird.classList.add("bird")
+    setCustomProperty(bird, "--left", 100)
+    worldElem.append(bird)
+  }
+
+  function randomNumberBetween(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+  }
+
+  return { setupBird, updateBird, getBirdRects }
+})()
