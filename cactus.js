@@ -66,9 +66,7 @@ function createCactusSprite(left) {
 
 function pickClusterSize() {
   const roll = Math.random()
-  if (roll < 0.6) return 1
-  if (roll < 0.9) return 2
-  return 3
+  return roll < 0.6 ? 1 : 2
 }
 
 function randomNumberBetween(min, max) {
