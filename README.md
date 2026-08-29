@@ -4,4 +4,4 @@ Mobius-dino is a Chrome dino clone **but** the sprites are swapped for Sonic spr
 
 ## Btw
 
-You can just run this by cloning the repo, hosting a web server (with either `python3 -m http.server 8000` or `npx serve .` and go to `http://localhost:8000`.
+You can just run this by cloning the repo, hosting a web server (with either `python3 -m http.server 8000` or `npx serve .`) and go to `http://localhost:8000` in your browser.
