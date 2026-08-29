@@ -6,7 +6,10 @@ import { setupTheme } from "./theme.js"
 
 const WORLD_WIDTH = 100
 const WORLD_HEIGHT = 30
+const WORLD_MAX_WIDTH = 800
 const SPEED_SCALE_INCREASE = 0.00001
+const DINO_HITBOX_INSET = 0.2
+const OBSTACLE_HITBOX_INSET = 0.1
 
 const worldElem = document.querySelector("[data-world]")
 const scoreElem = document.querySelector("[data-score]")
@@ -41,10 +44,21 @@ function update(time) {
 }
 
 function checkLose() {
-  const dinoRect = getDinoRect()
-  return [...getCactusRects(), ...getBirdRects()].some(rect =>
-    isCollision(rect, dinoRect)
-  )
+  const dinoRect = shrinkRect(getDinoRect(), DINO_HITBOX_INSET)
+  return [...getCactusRects(), ...getBirdRects()]
+    .map(rect => shrinkRect(rect, OBSTACLE_HITBOX_INSET))
+    .some(rect => isCollision(rect, dinoRect))
+}
+
+function shrinkRect(rect, insetRatio) {
+  const insetX = rect.width * insetRatio
+  const insetY = rect.height * insetRatio
+  return {
+    left: rect.left + insetX,
+    right: rect.right - insetX,
+    top: rect.top + insetY,
+    bottom: rect.bottom - insetY,
+  }
 }
 
 function isCollision(rect1, rect2) {
@@ -93,6 +107,9 @@ function setPixelToWorldScale() {
     worldToPixelScale = window.innerHeight / WORLD_HEIGHT
   }
 
-  worldElem.style.width = `${WORLD_WIDTH * worldToPixelScale}px`
-  worldElem.style.height = `${WORLD_HEIGHT * worldToPixelScale}px`
+  const width = Math.min(WORLD_WIDTH * worldToPixelScale, WORLD_MAX_WIDTH)
+  const height = (width * WORLD_HEIGHT) / WORLD_WIDTH
+
+  worldElem.style.width = `${width}px`
+  worldElem.style.height = `${height}px`
 }

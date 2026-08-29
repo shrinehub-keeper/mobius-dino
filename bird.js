@@ -7,17 +7,22 @@ import {
 const SPEED = 0.05
 const BIRD_INTERVAL_MIN = 1000
 const BIRD_INTERVAL_MAX = 3000
+const BIRD_START_DELAY = 15000
 const worldElem = document.querySelector("[data-world]")
 
 let nextBirdTime
+let elapsedTime
 export function setupBird() {
-  nextBirdTime = BIRD_INTERVAL_MIN
+  nextBirdTime = BIRD_START_DELAY
+  elapsedTime = 0
   document.querySelectorAll("[data-bird]").forEach(bird => {
     bird.remove()
   })
 }
 
 export function updateBird(delta, speedScale) {
+  elapsedTime += delta
+
   document.querySelectorAll("[data-bird]").forEach(bird => {
     incrementCustomProperty(bird, "--left", delta * speedScale * SPEED * -1)
     if (getCustomProperty(bird, "--left") <= -100) {
